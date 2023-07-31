@@ -1,0 +1,10 @@
+configs:
+  redpanda_brokers: "127.0.0.1:61116,127.0.0.1:61118,127.0.0.1:61115"
+  topic: "rp_hpe_v1"
+  no_of_records: 10
+  no_of_vins: 10
+  vin_prefix: "VIN"
+  no_of_partitions: 3
+  group_id: "rp-group-v1"
+  auto_offset_reset: "latest"
+  enable_auto_commit: False
