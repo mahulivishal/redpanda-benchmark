@@ -21,11 +21,12 @@ def get_redpanda_producer():
 
 def initialise_configs():
     global configs
-    print(configs)
     if not configs:
+        print("Initialising Configs............")
         with open("rp.yml", "r") as f:
             configs = yaml.load(f, Loader=yaml.FullLoader)
         configs = configs["configs"]
+        print(configs)
 
 
 def on_success(metadata):
@@ -62,8 +63,7 @@ def push_to_redpanda():
     print("Pushing records to redpanda.......")
     for i in range(1, configs["no_of_records"]):
         payload = mock_data()
-        partition = int(hash(str(payload["vin"])) % int(configs["no_of_partitions"]))
-        future = producer.send(configs["topic"], value=payload)
+        producer.send(configs["topic"], value=payload)
     flush_producer()
 
 
@@ -71,7 +71,6 @@ def flush_producer():
     global producer
     producer.flush()
     producer.close()
-    producer = None
 
 
 if __name__ == '__main__':
