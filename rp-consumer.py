@@ -12,7 +12,8 @@ configs = None
 def get_redpanda_consumer():
     global consumer
     if not consumer:
-        consumer = KafkaConsumer(bootstrap_servers=list(str(configs["redpanda_brokers"]).split(",")),
+        print(f'Initialising {configs["system"]} consumer.......')
+        consumer = KafkaConsumer(bootstrap_servers=list(str(configs["brokers"]).split(",")),
                                  group_id=configs["group_id"],
                                  auto_offset_reset=configs["auto_offset_reset"],
                                  enable_auto_commit=configs["enable_auto_commit"])
@@ -38,7 +39,10 @@ def start_consumer():
             value = json.loads(message.value.decode("utf-8"))
             start = eval(value["timestamp"])
             end = eval(str(time.time()).replace('.', '')[0:13])
-            latency_dict[str(value["id"])] = [start, end]
+            if end > start:
+                latency_dict[str(value["id"])] = {"delay": end - start}
+            else:
+                print(f'{end}, {value}')
             if message.partition in partition_distribution.keys():
                 count = partition_distribution[message.partition]
                 partition_distribution[message.partition] = count + 1
@@ -59,10 +63,8 @@ def get_latency_report(latency_dict):
     delays = []
     for r_id in latency_dict.keys():
         latency = latency_dict[r_id]
-        delay = latency[1] - latency[0]
-        #print(delay)
-        delays.append(delay)
-    return reduce(lambda a, b: a + b, delays) / len(delays)
+        delays.append(latency["delay"])
+    return int(reduce(lambda a, b: a + b, delays) / len(delays))
 
 
 def get_partition_distribution(partition_distribution, count):

@@ -15,10 +15,11 @@ configs = None
 def get_redpanda_producer():
     global producer
     if not producer:
-        print("Initialising REDPANDA producer.......")
-        producer = KafkaProducer(bootstrap_servers=list(str(configs["redpanda_brokers"]).split(",")),
+        print(f'Initialising {configs["system"]} producer.......')
+        producer = KafkaProducer(bootstrap_servers=list(str(configs["brokers"]).split(",")),
                                  api_version=(1, 0, 0),
-                                 value_serializer=lambda x: json.dumps(x).encode('utf-8'))
+                                 value_serializer=lambda x: json.dumps(x).encode('utf-8'),
+                                 acks=1)
 
 
 def initialise_configs():
@@ -63,7 +64,7 @@ def mock_data():
 # Produce asynchronously with callbacks
 def push_to_redpanda():
     global producer
-    print("Pushing records to redpanda.......")
+    print(f'Pushing records to {configs["system"]}.......')
     start = eval(str(time.time()).replace('.', '')[0:13])
     for i in range(0, configs["no_of_records"]):
         payload = mock_data()

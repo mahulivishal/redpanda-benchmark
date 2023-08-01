@@ -1,6 +1,6 @@
 configs:
-  redpanda_brokers: "127.0.0.1:53805,127.0.0.1:53810,127.0.0.1:53814"
+  redpanda_brokers: "127.0.0.1:58524"
   topics:
-    - topic: "rp_hpe_v2"
-      partitions: 5
-      replication: 3
+    - topic: "rp_hpe_v3"
+      partitions: 1
+      replication: 1
