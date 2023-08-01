@@ -1,8 +1,8 @@
 configs:
-  redpanda_brokers: "127.0.0.1:57182,127.0.0.1:57185,127.0.0.1:57195"
+  redpanda_brokers: "127.0.0.1:53805,127.0.0.1:53810,127.0.0.1:53814"
   topic: "rp_hpe_v2"
-  no_of_records: 10
-  no_of_vins: 10
+  no_of_records: 1000000
+  no_of_vins: 100
   vin_prefix: "VIN"
   no_of_partitions: 3
   group_id: "rp-hpe-group-v2"

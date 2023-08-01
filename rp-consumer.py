@@ -1,4 +1,6 @@
 import json
+import time
+from functools import reduce
 
 import yaml
 from kafka import KafkaConsumer
@@ -29,14 +31,45 @@ def initialise_configs():
 def start_consumer():
     print(f'Consumer Subscribing to TOPIC: {configs["topic"]}')
     consumer.subscribe(configs["topic"])
+    latency_dict, partition_distribution = {}, {}
     try:
         print(f'Consumer RUNNING.............')
         for message in consumer:
-            topic_info = f'Topic: {configs["topic"]} | Partition: {message.partition}'
-            message_info = f"Key: {message.key}, Data: {message.value}"
-            print(f"{topic_info}, {message_info}")
+            value = json.loads(message.value.decode("utf-8"))
+            start = eval(value["timestamp"])
+            end = eval(str(time.time()).replace('.', '')[0:13])
+            latency_dict[str(value["id"])] = [start, end]
+            if message.partition in partition_distribution.keys():
+                count = partition_distribution[message.partition]
+                partition_distribution[message.partition] = count + 1
+            else:
+                partition_distribution[message.partition] = 1
     except Exception as e:
         print(f"Error occurred while consuming messages: {e}")
+    finally:
+        consumer.close()
+        print("REPORT==============================")
+        print(f"No of records consumed: {len(latency_dict.keys())}")
+        print(f"Avg latency per record in MS: {get_latency_report(latency_dict)}")
+        print(f'Partition Distribution: {get_partition_distribution(partition_distribution, len(latency_dict.keys()))}')
+        print("====================================")
+
+
+def get_latency_report(latency_dict):
+    delays = []
+    for r_id in latency_dict.keys():
+        latency = latency_dict[r_id]
+        delay = latency[1] - latency[0]
+        #print(delay)
+        delays.append(delay)
+    return reduce(lambda a, b: a + b, delays) / len(delays)
+
+
+def get_partition_distribution(partition_distribution, count):
+    for partitions in partition_distribution.keys():
+        count_partition = partition_distribution[partitions]
+        partition_distribution[partitions] = count_partition / count * 100
+    return partition_distribution
 
 
 if __name__ == '__main__':

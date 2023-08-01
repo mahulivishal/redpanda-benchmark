@@ -2,6 +2,8 @@ import json
 import random
 import string
 import time
+import uuid
+
 import yaml
 
 from kafka import KafkaProducer
@@ -43,7 +45,8 @@ def mock_data():
     event_types = ["BCM_EVENT", "BMS_EVENT", "FAULT", "HMI_EVENT", "GPS_EVENT"]
     sw_versions = ["v1.0", "v2.0", "v3.0", "v4.0", "v5.0"]
     v_id = ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(6))
-    payload = {"timestamp": str(time.time()).replace('.', '')[0:13],
+    payload = {"id": str(uuid.uuid4()),
+               "timestamp": str(time.time()).replace('.', '')[0:13],
                "schema_version": "1.0",
                "packet_id": random.randrange(configs["no_of_records"]),
                "v_id": v_id,
@@ -61,10 +64,15 @@ def mock_data():
 def push_to_redpanda():
     global producer
     print("Pushing records to redpanda.......")
-    for i in range(1, configs["no_of_records"]):
+    start = eval(str(time.time()).replace('.', '')[0:13])
+    for i in range(0, configs["no_of_records"]):
         payload = mock_data()
         producer.send(configs["topic"], value=payload, key=str(payload["vin"]).encode("utf-8"))
     flush_producer()
+    end = eval(str(time.time()).replace('.', '')[0:13])
+    print("REPORT==============================")
+    print(f"No of records pushed: {configs['no_of_records']} in {(end - start)/1000} seconds")
+    print("====================================")
 
 
 def flush_producer():

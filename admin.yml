@@ -1,5 +1,5 @@
 configs:
-  redpanda_brokers: "127.0.0.1:57182,127.0.0.1:57185,127.0.0.1:57195"
+  redpanda_brokers: "127.0.0.1:53805,127.0.0.1:53810,127.0.0.1:53814"
   topics:
     - topic: "rp_hpe_v2"
       partitions: 5
