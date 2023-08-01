@@ -63,7 +63,7 @@ def push_to_redpanda():
     print("Pushing records to redpanda.......")
     for i in range(1, configs["no_of_records"]):
         payload = mock_data()
-        producer.send(configs["topic"], value=payload)
+        producer.send(configs["topic"], value=payload, key=str(payload["vin"]).encode("utf-8"))
     flush_producer()
 
 
