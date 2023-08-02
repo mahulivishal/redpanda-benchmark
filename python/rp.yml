@@ -1,0 +1,10 @@
+configs:
+  system: "KAFKA"
+  brokers: "127.0.0.1:9092"
+  topic: "rp_hpe_v3"
+  no_of_records: 100
+  no_of_vins: 100
+  vin_prefix: "VIN"
+  group_id: "rp-hpe-group-v2"
+  auto_offset_reset: "latest"
+  enable_auto_commit: True
